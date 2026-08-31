@@ -1,0 +1,14 @@
+{
+  "artem":   { "company": "1.jpg", "name": "Артём Павлов",    "job": "арт-директор в\u00a0e\u2011com" },
+  "asya":    { "company": "6.jpg", "name": "Ася Чехова",      "job": "маркетолог в\u00a0FineFood" },
+  "elena":   { "company": "6.jpg", "name": "Елена Иванова",   "job": "копирайтер в\u00a0FineFood" },
+  "gleb":    { "company": "1.jpg", "name": "Глеб Островский", "job": "продакт-менеджер в\u00a0Traveltechnologies" },
+  "igor":    { "company": "1.jpg", "name": "Игорь Кустов",    "job": "дизайнер в\u00a0e\u2011com" },
+  "irina":   { "company": "1.jpg", "name": "Ирина Кузьмина",  "job": "дизайнер бренда в\u00a0e\u2011com" },
+  "mark":    { "company": "6.jpg", "name": "Марк Купцов",     "job": "дизайнер в\u00a0e\u2011com" },
+  "mira":    { "company": "6.jpg", "name": "Мира Снежина",    "job": "маркетолог в\u00a0FineFood" },
+  "natalia": { "company": "1.jpg", "name": "Наталья Смирнова","job": "проджект-менеджер в\u00a0Traveltechnologies" },
+  "nikita":  { "company": "1.jpg", "name": "Никита Петров",   "job": "аналитик данных в\u00a0fintech" },
+  "taras":   { "company": "6.jpg", "name": "Тарас Рублев",    "job": "разработчик в\u00a0fintech" },
+  "tatyana": { "company": "6.jpg", "name": "Татьяна Сидорова","job": "маркетолог в\u00a0FineFood" }
+}

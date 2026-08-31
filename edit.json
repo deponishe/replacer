@@ -1,0 +1,4 @@
+{
+  "nameLayers": ["имя", "title"],
+  "jobLayers": ["subtitle", "проф + company", "проф + компания"]
+}
