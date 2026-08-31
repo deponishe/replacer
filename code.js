@@ -1,38 +1,5 @@
 figma.showUI(__html__, { width: 440, height: 548, title: "Image Replacer" });
 
-// Кристально точный бесшовный Base64-декодер (lossless)
-// Исключает повреждение маленьких JPEG/PNG файлов и сохраняет оригинальную четкость пикселей
-function base64ToBytes(b64) {
-  // Очищаем от знаков заполнения "=" в конце и лишних пробелов
-  const cleaned = b64.replace(/=+$/, "").replace(/\s/g, "");
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  const lookup = new Uint8Array(256);
-  for (let i = 0; i < chars.length; i++) {
-    lookup[chars.charCodeAt(i)] = i;
-  }
-
-  const len = cleaned.length;
-  const bufferLength = Math.floor(len * 0.75);
-  const bytes = new Uint8Array(bufferLength);
-
-  let p = 0;
-  for (let i = 0; i < len; i += 4) {
-    const c1 = lookup[cleaned.charCodeAt(i)];
-    const c2 = lookup[cleaned.charCodeAt(i + 1)];
-    const c3 = i + 2 < len ? lookup[cleaned.charCodeAt(i + 2)] : 0;
-    const c4 = i + 3 < len ? lookup[cleaned.charCodeAt(i + 3)] : 0;
-
-    bytes[p++] = (c1 << 2) | (c2 >> 4);
-    if (p < bufferLength) {
-      bytes[p++] = ((c2 & 15) << 4) | (c3 >> 2);
-      if (p < bufferLength) {
-        bytes[p++] = ((c3 & 3) << 6) | c4;
-      }
-    }
-  }
-  return bytes;
-}
-
 function isVisible(node) {
   let current = node;
   while (current) {
@@ -214,7 +181,7 @@ async function replaceAll(nodeIds, imagesBank, companyBank, personNames, personT
     const addonImage     = item.addonImageId     ? figma.getNodeById(item.addonImageId)     : null;
     const avatarNode     = figma.getNodeById(item.id);
 
-    if (!containerImage || !imagesBank || imagesBank.length === 0) { skipped++; queueIndex++; continue; }
+    if (!containerImage) { skipped++; queueIndex++; continue; }
 
     try {
       const personIndex  = personQueue[queueIndex++];
@@ -222,8 +189,8 @@ async function replaceAll(nodeIds, imagesBank, companyBank, personNames, personT
       const fullName     = personToName[personKey] || personKey;
       const job          = personToJob[personKey]  || "";
 
-      // Lossless декодер
-      const avatarBytes = base64ToBytes(imagesBank[personIndex]);
+      // Вставляем оригинальные байты напрямую (lossless)
+      const avatarBytes = new Uint8Array(imagesBank[personIndex]);
       const avatarHash = figma.createImage(avatarBytes).hash;
       containerImage.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: avatarHash }];
       replaced++;
@@ -232,8 +199,7 @@ async function replaceAll(nodeIds, imagesBank, companyBank, personNames, personT
         const companyIndex = personToCompany[personKey] !== undefined ? personToCompany[personKey] : 0;
         const safeIndex    = Math.min(companyIndex, companyBank.length - 1);
         
-        // Lossless декодер для логотипов
-        const companyBytes = base64ToBytes(companyBank[safeIndex]);
+        const companyBytes = new Uint8Array(companyBank[safeIndex]);
         const hash = figma.createImage(companyBytes).hash;
         addonImage.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: hash }];
       }
@@ -241,7 +207,7 @@ async function replaceAll(nodeIds, imagesBank, companyBank, personNames, personT
       await updateTexts(avatarNode, fullName, job, useLineBreak, nameLayers, jobLayers);
 
     } catch(e) {
-      console.error("Error:", item.id, e);
+      console.error("Error replacement:", item.id, e);
       skipped++;
     }
   }
@@ -317,8 +283,7 @@ figma.ui.onmessage = async (msg) => {
           const personKey   = personNames[personIndex];
           const fullName    = personToName[personKey] || personKey;
           const job         = personToJob[personKey]  || "";
-          
-          const avatarBytes = base64ToBytes(imagesBank[personIndex]);
+          const avatarBytes = new Uint8Array(imagesBank[personIndex]);
           const hash = figma.createImage(avatarBytes).hash;
           containerImage.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: hash }];
           replaced++;
@@ -333,8 +298,7 @@ figma.ui.onmessage = async (msg) => {
         if (!companyBank || companyBank.length === 0) { skipped++; continue; }
         try {
           const randomCompany = companyBank[Math.floor(Math.random() * companyBank.length)];
-          
-          const companyBytes = base64ToBytes(randomCompany);
+          const companyBytes = new Uint8Array(randomCompany);
           const hash = figma.createImage(companyBytes).hash;
           if (addonImage) {
             addonImage.fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: hash }];
